@@ -23,10 +23,23 @@ Building from scratch, step by step. Completed step: Step 1 — the fleet simula
   bounds imported from fleet.py (never hardcoded). Approval workflow for high-risk
   actions; append-only AuditLog.
 
+- agent.py — the closed remediation loop. The ONLY module that translates named
+  actions into fleet's apply() schema and the ONLY caller of guardrails.evaluate.
+  remediate() runs snapshot → decide → gate → apply → verify → rollback; sweep()
+  runs it over every unhealthy device. MockBrain proposes actions from telemetry
+  only (never the hidden fault). The real LLM brain will implement the same
+  decide(view)->named-action interface and drop in unchanged.
+
 ## Invariants (additions)
 - No action reaches the world without passing guardrails.evaluate first.
 - evaluate() is pure: no mutation, no I/O. Anything not whitelisted is DENIED.
 - Bounds come from fleet.py; the policy layer imports, never redefines them.
+- The agent never applies an action without an ALLOW/approved verdict; translation
+  to the world schema happens only after the gate.
+- Every remediation snapshots first and rolls back if health isn't restored.
+- The agent is the sole writer to the AuditLog; evaluate() stays pure.
+- Four honest outcomes — success / rolled_back / denied / no_diagnosis — kept
+  distinct so the audit trail tells the truth about why nothing changed.
 
 ## Conventions
 - Python 3.9+, standard library only for the core.
