@@ -7,7 +7,7 @@ with approval, audit, verification, and rollback. The product is the guardrail +
 evaluation harness, not the agent.
 
 ## Status
-Building from scratch, step by step. Current step: Step 1 — the fleet simulator.
+Building from scratch, step by step. Completed step: Step 1 — the fleet simulator. Current step: Step 2 — guardrails.
 
 ## Modules
 - fleet.py — the simulated world. Devices with Params (action surface),
@@ -17,6 +17,16 @@ Building from scratch, step by step. Current step: Step 1 — the fleet simulato
   infer it). snapshot()/restore() support rollback. REMEDIATION/remediation_for
   encode ground-truth fixes — for the world/eval ONLY; the agent under test must
   never import them or read .fault.
+  
+- guardrails.py — the policy gate. evaluate(action, value) is a PURE function
+  returning ALLOW/NEEDS_APPROVAL/DENY. Default-deny whitelist of NAMED actions;
+  bounds imported from fleet.py (never hardcoded). Approval workflow for high-risk
+  actions; append-only AuditLog.
+
+## Invariants (additions)
+- No action reaches the world without passing guardrails.evaluate first.
+- evaluate() is pure: no mutation, no I/O. Anything not whitelisted is DENIED.
+- Bounds come from fleet.py; the policy layer imports, never redefines them.
 
 ## Conventions
 - Python 3.9+, standard library only for the core.
