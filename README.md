@@ -29,6 +29,14 @@ the real local model drops into this same loop later. Every action passes throug
 policy by construction, and every phase is recorded to the audit log. Outcomes are
 honest: success / rolled_back / denied / no_diagnosis. See agent.py.
 
+## Evaluation
+The harness scores any brain against a battery of known-fault scenarios on three
+independent dimensions — diagnosed (correct action family), in_bounds (passes policy),
+and resolved (device actually healthy after the real remediate loop runs). Ground truth
+is visible to the scorer but never to the brain under test. The MockBrain scores 6/6 as
+the known-good baseline; the same harness will score the real local model unchanged.
+See evaluate.py and scenarios.py.
+
 ## Run
 python fleet.py     # demo: inject a fault, apply the fix, watch health restore
 pytest -v           # tests
