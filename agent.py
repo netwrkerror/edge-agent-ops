@@ -98,6 +98,21 @@ def translate(action: str, value: Any) -> Dict[str, Any]:
 def remediate(device, brain, audit, interactive: bool = False) -> Dict[str, Any]:
     """Run one decide -> gate -> act -> verify -> (rollback) cycle on a device.
 
+    Calls the brain exactly once for its proposed action, then runs the rest of
+    the cycle on that single decision via `remediate_with_decision`.
+    """
+    decision = brain.decide(device.view())
+    return remediate_with_decision(device, decision, audit, interactive=interactive)
+
+
+def remediate_with_decision(
+    device, decision: Dict[str, Any], audit, interactive: bool = False
+) -> Dict[str, Any]:
+    """Run gate -> act -> verify -> (rollback) on a PRE-SUPPLIED decision.
+
+    The brain is never consulted here, so a caller (e.g. the eval harness) can
+    score the same single decision and still drive the real machinery.
+
     Returns a trace dict describing what happened. Records every phase to the
     audit log. The world is only ever changed through a policy-permitted action,
     and is restored from the snapshot if remediation fails to restore health.
@@ -108,8 +123,7 @@ def remediate(device, brain, audit, interactive: bool = False) -> Dict[str, Any]
         "healthy_before": device.is_healthy(),
     }
 
-    # 1-2. Ask the brain for a proposed named action (from the view only).
-    proposed = brain.decide(device.view())
+    proposed = decision
     action, value = proposed["action"], proposed["value"]
     trace["proposed"] = proposed
     audit.record(phase="proposed", device_id=device.id, **proposed)

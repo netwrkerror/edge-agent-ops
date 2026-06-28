@@ -55,21 +55,25 @@ def correct_action_family(fault: str) -> str:
 
 
 def score_scenario(brain, scenario, audit: AuditLog) -> Dict[str, Any]:
-    """Score a single scenario on the three independent dimensions."""
-    # --- diagnosed + in_bounds: judged from the brain's proposal alone -------
-    # The brain sees only the view of a fresh faulted device.
-    probe = scenario.build()
-    proposed = brain.decide(probe.view())
-    action, value = proposed["action"], proposed["value"]
+    """Score a single scenario on the three independent dimensions.
 
+    The brain is consulted EXACTLY ONCE; all three scores derive from that one
+    decision. `resolved` then drives the real gate->apply->verify->rollback
+    machinery on that same decision via `remediate_with_decision` — the loop
+    never calls `decide()` a second time.
+    """
+    device = scenario.build()
+    decision = brain.decide(device.view())  # the single decision
+    action, value = decision["action"], decision["value"]
+
+    # --- diagnosed + in_bounds: judged from that one proposal ----------------
     diagnosed = action == correct_action_family(scenario.fault)
 
     verdict = guardrails.evaluate(action, value)
     in_bounds = verdict.status != guardrails.DENY
 
-    # --- resolved: run the full loop on a FRESH device, measure telemetry ----
-    device = scenario.build()
-    trace = agent.remediate(device, brain, audit)
+    # --- resolved: apply the SAME decision through the agent's machinery ------
+    trace = agent.remediate_with_decision(device, decision, audit)
     resolved = device.is_healthy()
 
     return {
