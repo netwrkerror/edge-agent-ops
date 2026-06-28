@@ -155,11 +155,28 @@ def report(brain, scenarios=SCENARIOS) -> List[Dict[str, Any]]:
 # --------------------------------------------------------------------------- #
 
 
-def _demo() -> None:
+def _build_brain(backend: str, model: str):
+    """Construct the requested brain. Ollama is imported lazily so the default
+    mock path stays dependency-free."""
+    if backend == "ollama":
+        from llm_brain import OllamaBrain
+
+        return OllamaBrain(model=model)
     from agent import MockBrain
 
-    report(MockBrain())
+    return MockBrain()
+
+
+def _main() -> None:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Score a brain against the scenarios.")
+    parser.add_argument("--backend", choices=("mock", "ollama"), default="mock")
+    parser.add_argument("--model", default="qwen3:14b")
+    args = parser.parse_args()
+
+    report(_build_brain(args.backend, args.model))
 
 
 if __name__ == "__main__":
-    _demo()
+    _main()

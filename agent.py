@@ -186,7 +186,17 @@ def sweep(fleet, brain, audit, interactive: bool = False) -> List[Dict[str, Any]
 # --------------------------------------------------------------------------- #
 
 
-def _demo() -> None:
+def _build_brain(backend: str, model: str):
+    """Construct the requested brain. Ollama is imported lazily so the default
+    mock path stays dependency-free."""
+    if backend == "ollama":
+        from llm_brain import OllamaBrain
+
+        return OllamaBrain(model=model)
+    return MockBrain()
+
+
+def _demo(backend: str = "mock", model: str = "qwen3:14b") -> None:
     from fleet import default_fleet
     from guardrails import AuditLog
 
@@ -198,7 +208,7 @@ def _demo() -> None:
     print("unhealthy before:", fleet.unhealthy())
 
     audit = AuditLog()
-    brain = MockBrain()
+    brain = _build_brain(backend, model)
     for trace in sweep(fleet, brain, audit, interactive=False):
         print(
             f"{trace['device_id']}: diagnosed={trace['proposed']['diagnosis']} "
@@ -210,4 +220,10 @@ def _demo() -> None:
 
 
 if __name__ == "__main__":
-    _demo()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Run the remediation loop demo.")
+    parser.add_argument("--backend", choices=("mock", "ollama"), default="mock")
+    parser.add_argument("--model", default="qwen3:14b")
+    args = parser.parse_args()
+    _demo(backend=args.backend, model=args.model)
