@@ -38,6 +38,12 @@ Building from scratch, step by step. Completed step: Step 1 — the fleet simula
   resolved (healthy after the real agent.remediate loop). The scorer may read ground
   truth; the brain under test sees only device.view().
 
+- llm_brain.py — OllamaBrain: a real local LLM behind the decide(view)->named-action
+  interface. Imports action set/bounds/thresholds from fleet.py so the prompt can't drift.
+  Deterministic (temp 0, /no_think). decide() NEVER raises: bad/unreachable responses
+  return a noop/parse_error fallback. Selected via --backend ollama; lazily imported so
+  the mock path stays dependency-free.
+
 ## Invariants (additions)
 - No action reaches the world without passing guardrails.evaluate first.
 - evaluate() is pure: no mutation, no I/O. Anything not whitelisted is DENIED.
@@ -52,6 +58,11 @@ Building from scratch, step by step. Completed step: Step 1 — the fleet simula
 - diagnosed is matched by action family, never exact value.
 - resolved must run the real remediate loop, not a re-implementation.
 - Only the scorer reads ground truth (.fault / remediation_for); the brain never does.
+- Brains are swappable behind decide(view); adding/changing a brain must not modify
+  agent.py, guardrails.py, fleet.py — wiring is config-only.
+- decide() must never raise; malformed model output degrades to no_diagnosis.
+- remediate_with_decision is the single gate→apply→verify→rollback path; the policy gate
+  runs on every decision, brain-supplied or eval-supplied.
 
 ## Conventions
 - Python 3.9+, standard library only for the core.

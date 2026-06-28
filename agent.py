@@ -98,6 +98,21 @@ def translate(action: str, value: Any) -> Dict[str, Any]:
 def remediate(device, brain, audit, interactive: bool = False) -> Dict[str, Any]:
     """Run one decide -> gate -> act -> verify -> (rollback) cycle on a device.
 
+    Calls the brain exactly once for its proposed action, then runs the rest of
+    the cycle on that single decision via `remediate_with_decision`.
+    """
+    decision = brain.decide(device.view())
+    return remediate_with_decision(device, decision, audit, interactive=interactive)
+
+
+def remediate_with_decision(
+    device, decision: Dict[str, Any], audit, interactive: bool = False
+) -> Dict[str, Any]:
+    """Run gate -> act -> verify -> (rollback) on a PRE-SUPPLIED decision.
+
+    The brain is never consulted here, so a caller (e.g. the eval harness) can
+    score the same single decision and still drive the real machinery.
+
     Returns a trace dict describing what happened. Records every phase to the
     audit log. The world is only ever changed through a policy-permitted action,
     and is restored from the snapshot if remediation fails to restore health.
@@ -108,8 +123,7 @@ def remediate(device, brain, audit, interactive: bool = False) -> Dict[str, Any]
         "healthy_before": device.is_healthy(),
     }
 
-    # 1-2. Ask the brain for a proposed named action (from the view only).
-    proposed = brain.decide(device.view())
+    proposed = decision
     action, value = proposed["action"], proposed["value"]
     trace["proposed"] = proposed
     audit.record(phase="proposed", device_id=device.id, **proposed)
@@ -186,7 +200,17 @@ def sweep(fleet, brain, audit, interactive: bool = False) -> List[Dict[str, Any]
 # --------------------------------------------------------------------------- #
 
 
-def _demo() -> None:
+def _build_brain(backend: str, model: str):
+    """Construct the requested brain. Ollama is imported lazily so the default
+    mock path stays dependency-free."""
+    if backend == "ollama":
+        from llm_brain import OllamaBrain
+
+        return OllamaBrain(model=model)
+    return MockBrain()
+
+
+def _demo(backend: str = "mock", model: str = "qwen3:14b") -> None:
     from fleet import default_fleet
     from guardrails import AuditLog
 
@@ -198,7 +222,7 @@ def _demo() -> None:
     print("unhealthy before:", fleet.unhealthy())
 
     audit = AuditLog()
-    brain = MockBrain()
+    brain = _build_brain(backend, model)
     for trace in sweep(fleet, brain, audit, interactive=False):
         print(
             f"{trace['device_id']}: diagnosed={trace['proposed']['diagnosis']} "
@@ -210,4 +234,10 @@ def _demo() -> None:
 
 
 if __name__ == "__main__":
-    _demo()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Run the remediation loop demo.")
+    parser.add_argument("--backend", choices=("mock", "ollama"), default="mock")
+    parser.add_argument("--model", default="qwen3:14b")
+    args = parser.parse_args()
+    _demo(backend=args.backend, model=args.model)

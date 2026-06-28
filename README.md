@@ -7,8 +7,8 @@ audit, verification, and rollback. (In active development.)
 - [x] Fleet simulator: devices, deterministic telemetry, fault model
 - [x] Guardrail engine (policy + bounds + approval + audit)
 - [x] Agent loop (observe → decide → check → apply → verify → rollback)
-- [ ] Evaluation harness
-- [ ] Local model (Ollama)
+- [x] Evaluation harness
+- [x] Local model (Ollama)
 
 ## The world (today)
 Brief: devices have a controllable parameter surface, telemetry that's a pure
@@ -36,6 +36,14 @@ and resolved (device actually healthy after the real remediate loop runs). Groun
 is visible to the scorer but never to the brain under test. The MockBrain scores 6/6 as
 the known-good baseline; the same harness will score the real local model unchanged.
 See evaluate.py and scenarios.py.
+
+## Local model
+The brain is now a real local LLM served by Ollama, behind the same decide(view)
+interface the mock used — selected with `--backend ollama --model <name>`. Inference is
+deterministic (temp 0, reasoning off) and fails safe: any malformed response degrades to
+"no action taken" rather than crashing or acting wrongly. The same eval harness scores it
+unchanged; both qwen3:8b and qwen3:14b resolve all six scenarios, with 8b faster on
+24GB-class hardware. See llm_brain.py.
 
 ## Run
 python fleet.py     # demo: inject a fault, apply the fix, watch health restore

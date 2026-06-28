@@ -55,21 +55,25 @@ def correct_action_family(fault: str) -> str:
 
 
 def score_scenario(brain, scenario, audit: AuditLog) -> Dict[str, Any]:
-    """Score a single scenario on the three independent dimensions."""
-    # --- diagnosed + in_bounds: judged from the brain's proposal alone -------
-    # The brain sees only the view of a fresh faulted device.
-    probe = scenario.build()
-    proposed = brain.decide(probe.view())
-    action, value = proposed["action"], proposed["value"]
+    """Score a single scenario on the three independent dimensions.
 
+    The brain is consulted EXACTLY ONCE; all three scores derive from that one
+    decision. `resolved` then drives the real gate->apply->verify->rollback
+    machinery on that same decision via `remediate_with_decision` — the loop
+    never calls `decide()` a second time.
+    """
+    device = scenario.build()
+    decision = brain.decide(device.view())  # the single decision
+    action, value = decision["action"], decision["value"]
+
+    # --- diagnosed + in_bounds: judged from that one proposal ----------------
     diagnosed = action == correct_action_family(scenario.fault)
 
     verdict = guardrails.evaluate(action, value)
     in_bounds = verdict.status != guardrails.DENY
 
-    # --- resolved: run the full loop on a FRESH device, measure telemetry ----
-    device = scenario.build()
-    trace = agent.remediate(device, brain, audit)
+    # --- resolved: apply the SAME decision through the agent's machinery ------
+    trace = agent.remediate_with_decision(device, decision, audit)
     resolved = device.is_healthy()
 
     return {
@@ -155,11 +159,28 @@ def report(brain, scenarios=SCENARIOS) -> List[Dict[str, Any]]:
 # --------------------------------------------------------------------------- #
 
 
-def _demo() -> None:
+def _build_brain(backend: str, model: str):
+    """Construct the requested brain. Ollama is imported lazily so the default
+    mock path stays dependency-free."""
+    if backend == "ollama":
+        from llm_brain import OllamaBrain
+
+        return OllamaBrain(model=model)
     from agent import MockBrain
 
-    report(MockBrain())
+    return MockBrain()
+
+
+def _main() -> None:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Score a brain against the scenarios.")
+    parser.add_argument("--backend", choices=("mock", "ollama"), default="mock")
+    parser.add_argument("--model", default="qwen3:14b")
+    args = parser.parse_args()
+
+    report(_build_brain(args.backend, args.model))
 
 
 if __name__ == "__main__":
-    _demo()
+    _main()
