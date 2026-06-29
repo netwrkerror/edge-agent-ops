@@ -44,6 +44,14 @@ Building from scratch, step by step. Completed step: Step 1 — the fleet simula
   return a noop/parse_error fallback. Selected via --backend ollama; lazily imported so
   the mock path stays dependency-free.
 
+- export_run.py — runs the real fleet+agent+eval and serializes a scripted, staggered
+  run to run.json (the data contract the dashboard consumes). Per-device frames carry
+  healthy, injected_fault (what was injected — NOT necessarily the current problem; eco
+  masks thermal without clearing it, restart truly clears error), and a derived display
+  status (healthy/remediating/awaiting_approval). Uses existing modules unchanged; mock
+  default (zero deps), --backend ollama for a real-model recording. run.json is a build
+  artifact (gitignored); the dashboard inlines a recorded run for the web.
+
 ## Invariants (additions)
 - No action reaches the world without passing guardrails.evaluate first.
 - evaluate() is pure: no mutation, no I/O. Anything not whitelisted is DENIED.
@@ -63,6 +71,12 @@ Building from scratch, step by step. Completed step: Step 1 — the fleet simula
 - decide() must never raise; malformed model output degrades to no_diagnosis.
 - remediate_with_decision is the single gate→apply→verify→rollback path; the policy gate
   runs on every decision, brain-supplied or eval-supplied.
+
+## Data contract (run.json)
+{ meta, timeline:[{tick, fleet:[{id,site,params,telemetry,healthy,injected_fault,status}],
+  events:[{device_id,diagnosis,action,value,verdict,approved,result}]}], eval:{by_model:[...]} }
+- healthy drives tile color; injected_fault is historical, not current.
+- status is the display state; the dashboard renders it directly (renderer stays dumb).
 
 ## Conventions
 - Python 3.9+, standard library only for the core.

@@ -9,6 +9,7 @@ audit, verification, and rollback. (In active development.)
 - [x] Agent loop (observe → decide → check → apply → verify → rollback)
 - [x] Evaluation harness
 - [x] Local model (Ollama)
+- [ ] Dashboard (replay visualization)   ← in progress: run exporter done, UI next
 
 ## The world (today)
 Brief: devices have a controllable parameter surface, telemetry that's a pure
