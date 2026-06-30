@@ -46,10 +46,13 @@ def test_export_run_writes_expected_shape(tmp_path):
     assert "success" in results, "expected a resolved remediation"
     assert "denied" in results, "expected a denied action"
 
-    # Eval scorecard present with the three counts.
+    # Eval scorecard present with the three counts and wall-clock latency.
     by_model = data["eval"]["by_model"]
     assert by_model, "eval.by_model should be non-empty"
-    summary = by_model[0]["summary"]
+    entry = by_model[0]
+    assert "latency_ms" in entry and isinstance(entry["latency_ms"], int)
+    assert "latency_per_decision_ms" in entry
+    summary = entry["summary"]
     for key in ("diagnosed", "in_bounds", "resolved", "total"):
         assert key in summary
 

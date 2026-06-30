@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Iterator
@@ -217,13 +218,19 @@ def build_timeline(brain, audit: AuditLog) -> List[Dict[str, Any]]:
 
 def build_eval(backend: str, model_label: str, brain) -> Dict[str, Any]:
     """Score the chosen brain against the scenarios and attach the scorecard."""
+    started = time.perf_counter()
     results = evaluate.run_eval(brain)
+    latency_ms = round((time.perf_counter() - started) * 1000)
+
     summary = evaluate.summarize(results)
+    n = len(results) or 1
     return {
         "by_model": [
             {
                 "backend": backend,
                 "model": model_label,
+                "latency_ms": latency_ms,
+                "latency_per_decision_ms": round(latency_ms / n),
                 "summary": _round(summary),
                 "scenarios": _round(results),
             }

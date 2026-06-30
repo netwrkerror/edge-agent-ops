@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>edge agent ops</title>
+<style>
+  /* ---- design tokens: defined for light, overridden for dark ---- */
+  :root {
+    --bg: #f6f6f7;
+    --surface: #ffffff;
+    --text: #1b1d1f;
+    --text-muted: #6a7178;
+    --border: #e4e5e8;
+
+    --green: #1a7f43;
+    --green-bg: #e9f5ed;
+    --amber: #9a5b08;
+    --amber-bg: #fbf1e0;
+    --red: #b3261e;
+    --red-bg: #fbe9e7;
+
+    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e0f10;
+      --surface: #17191b;
+      --text: #e6e7ea;
+      --text-muted: #969ca3;
+      --border: #2a2d30;
+
+      --green: #56c98a;
+      --green-bg: #11241a;
+      --amber: #e0a13c;
+      --amber-bg: #271d0e;
+      --red: #ec6a62;
+      --red-bg: #2a1513;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 28px 24px 64px;
+  }
+
+  .mono { font-family: var(--font-mono); }
+
+  /* ---- header ---- */
+  header.app {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  header.app h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  header.app .subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .pill-live {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .pill-live .dot {
+    width: 7px; height: 7px;
+    border-radius: 999px;
+    background: var(--text-muted);
+  }
+  .pill-live.mode-live .dot { background: var(--green); }
+
+  /* ---- section headings ---- */
+  h2.section {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+    margin: 28px 0 12px;
+  }
+
+  /* ---- summary cards ---- */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .card .label { color: var(--text-muted); font-size: 12px; }
+  .card .value { font-size: 26px; font-weight: 600; margin-top: 4px; }
+  .card .value .unit { font-size: 14px; color: var(--text-muted); font-weight: 400; }
+
+  /* ---- fleet grid ---- */
+  .fleet {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .tile.s-healthy { border-left-color: var(--green); }
+  .tile.s-remediating { border-left-color: var(--red); }
+  .tile.s-awaiting_approval { border-left-color: var(--amber); }
+  .tile .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .tile .id { font-weight: 600; font-family: var(--font-mono); }
+  .tile .site { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
+  .telemetry {
+    display: flex;
+    gap: 14px;
+    margin-top: 10px;
+    font-size: 13px;
+  }
+  .telemetry .metric { color: var(--text-muted); }
+  .telemetry .metric .num { font-family: var(--font-mono); color: var(--text); margin-left: 4px; }
+  .telemetry .metric.danger .num,
+  .telemetry .metric.danger { color: var(--red); font-weight: 600; }
+
+  /* ---- tags (status pills + result badges) ---- */
+  .tag {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .tag.green { color: var(--green); background: var(--green-bg); }
+  .tag.amber { color: var(--amber); background: var(--amber-bg); }
+  .tag.red { color: var(--red); background: var(--red-bg); }
+  .tag.muted { color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); }
+
+  /* ---- decision stream ---- */
+  .stream {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    max-height: 280px;        /* ~5-6 rows; older events scroll internally */
+    overflow-y: auto;
+    /* scrollbar colors from tokens so dark mode stays correct */
+    scrollbar-color: var(--border) transparent;
+    scrollbar-width: thin;
+  }
+  .stream::-webkit-scrollbar { width: 10px; }
+  .stream::-webkit-scrollbar-track { background: transparent; }
+  .stream::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+    border: 3px solid var(--surface);
+  }
+  .stream .row {
+    display: grid;
+    grid-template-columns: 48px 96px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 14px;
+    border-top: 1px solid var(--border);
+  }
+  .stream .row:first-child { border-top: none; }
+  .stream .row .t { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }
+  .stream .row .dev { font-family: var(--font-mono); }
+  .stream .row .act { font-family: var(--font-mono); color: var(--text-muted); }
+  .stream .empty { padding: 14px; color: var(--text-muted); }
+
+  /* ---- eval panel ---- */
+  .eval {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+  .evalcard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .evalcard .model { font-weight: 600; font-family: var(--font-mono); }
+  .evalcard .lat { color: var(--text-muted); font-size: 12px; margin: 2px 0 12px; }
+  .evalcard .stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-top: 1px solid var(--border);
+  }
+  .evalcard .stat .k { color: var(--text-muted); }
+  .evalcard .stat .v { font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <h1>edge agent ops</h1>
+    <span class="subtitle" id="subtitle"></span>
+    <span class="pill-live" id="pill"><span class="dot"></span> <span id="pill-text">replay</span></span>
+  </header>
+
+  <section class="cards" id="cards"></section>
+
+  <h2 class="section">fleet</h2>
+  <section class="fleet" id="fleet"></section>
+
+  <h2 class="section">decision stream</h2>
+  <section class="stream" id="stream"></section>
+
+  <h2 class="section">evaluation</h2>
+  <section class="eval" id="eval"></section>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Inlined run.json sample (data contract: {meta, timeline, eval}).
+// Regenerate later with: python3 export_run.py --out run.json  and paste here,
+// or switch loadRun() to live mode below.
+// ---------------------------------------------------------------------------
+const RUN = {
+  "meta": {
+    "schema_version": "1.0",
+    "generated_at": "2026-06-30T23:36:36.135119+00:00",
+    "backend": "ollama",
+    "model": "qwen3:8b",
+    "ticks": 9,
+    "thresholds": {
+      "cpu_temp_c": 80.0,
+      "inference_latency_ms": 250.0,
+      "error_rate": 0.05
+    }
+  },
+  "timeline": [
+    {
+      "tick": 0,
+      "fleet": [
+        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
+        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
+        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
+        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+      ],
+      "events": []
+    },
+    {
+      "tick": 1,
+      "fleet": [
+        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
+        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
+        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
+        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+      ],
+      "events": [
+        { "device_id": "edge-01", "diagnosis": "overheating", "action": "set_power_mode", "value": "eco", "verdict": "ALLOW", "approved": null, "result": "success" }
+      ]
+    },
+    {
+      "tick": 2,
+      "fleet": [
+        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
+        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
+        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
+        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+      ],
+      "events": [
+        { "device_id": "edge-03", "diagnosis": "High inference latency", "action": "scale_workers", "value": 4, "verdict": "ALLOW", "approved": null, "result": "success" }
+      ]
+    },
+    {
+      "tick": 3,
+      "fleet": [
+        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
+        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
+        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
+        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+      ],
+      "events": [
+        { "device_id": "edge-04", "diagnosis": "high error rate", "action": "restart_worker", "value": null, "verdict": "NEEDS_APPROVAL", "approved": true, "result": "success" }
+      ]
+    },
+    {
+      "tick": 4,
+      "fleet": [
+        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
+        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 89.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": false, "injected_fault": "thermal", "status": "remediating" },
+        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
+        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+      ],
+      "events": [
+        { "device_id": "edge-02", "diagnosis": "thermal", "action": "scale_workers", "value": 99, "verdict": "DENY", "approved": null, "result": "denied" }
+      ]
+    },
+    {
+      "tick": 5,
+      "fleet": [
+        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
+        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 89.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": false, "injected_fault": "thermal", "status": "remediating" },
+        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
+        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+      ],
+      "events": [
+        { "device_id": "edge-02", "diagnosis": "thermal", "action": "scale_workers", "value": 8, "verdict": "ALLOW", "approved": null, "result": "rolled_back" }
+      ]
+    },
+    {
+      "tick": 6,
+      "fleet": [
+        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
+        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
+        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
+        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+      ],
+      "events": [
+        { "device_id": "edge-02", "diagnosis": "Overheating detected", "action": "set_power_mode", "value": "eco", "verdict": "ALLOW", "approved": null, "result": "success" }
+      ]
+    },
+    {
+      "tick": 7,
+      "fleet": [
+        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 29.0, "inference_latency_ms": 76.0, "error_rate": 0.21 }, "healthy": false, "injected_fault": "error", "status": "awaiting_approval" },
+        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
+        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
+        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+      ],
+      "events": [
+        { "device_id": "edge-01", "diagnosis": "error", "action": "restart_worker", "value": null, "verdict": "NEEDS_APPROVAL", "approved": false, "result": "declined" }
+      ]
+    },
+    {
+      "tick": 8,
+      "fleet": [
+        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 29.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
+        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
+        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
+        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+      ],
+      "events": [
+        { "device_id": "edge-01", "diagnosis": "high error rate", "action": "restart_worker", "value": null, "verdict": "NEEDS_APPROVAL", "approved": true, "result": "success" }
+      ]
+    }
+  ],
+  "eval": {
+    "by_model": [
+      {
+        "backend": "ollama",
+        "model": "qwen3:8b",
+        "latency_ms": 72756,
+        "latency_per_decision_ms": 12126,
+        "summary": { "total": 6, "diagnosed": 6, "diagnosed_rate": 1.0, "in_bounds": 6, "in_bounds_rate": 1.0, "resolved": 6, "resolved_rate": 1.0 },
+        "scenarios": [
+          { "name": "thermal_basic", "fault": "thermal", "proposed": { "action": "set_power_mode", "value": "eco" }, "diagnosed": true, "in_bounds": true, "verdict": "ALLOW", "resolved": true, "result": "success" },
+          { "name": "thermal_turbo_load", "fault": "thermal", "proposed": { "action": "set_power_mode", "value": "eco" }, "diagnosed": true, "in_bounds": true, "verdict": "ALLOW", "resolved": true, "result": "success" },
+          { "name": "latency_basic", "fault": "latency", "proposed": { "action": "scale_workers", "value": 4 }, "diagnosed": true, "in_bounds": true, "verdict": "ALLOW", "resolved": true, "result": "success" },
+          { "name": "latency_heavy_batch", "fault": "latency", "proposed": { "action": "scale_workers", "value": 4 }, "diagnosed": true, "in_bounds": true, "verdict": "ALLOW", "resolved": true, "result": "success" },
+          { "name": "error_basic", "fault": "error", "proposed": { "action": "restart_worker", "value": null }, "diagnosed": true, "in_bounds": true, "verdict": "NEEDS_APPROVAL", "resolved": true, "result": "success" },
+          { "name": "error_busy", "fault": "error", "proposed": { "action": "restart_worker", "value": null }, "diagnosed": true, "in_bounds": true, "verdict": "NEEDS_APPROVAL", "resolved": true, "result": "success" }
+        ]
+      }
+    ]
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Data source seam. Static mode returns the inlined RUN. The renderer only
+// ever awaits loadRun(); it never assumes where the data came from.
+// ---------------------------------------------------------------------------
+async function loadRun() {
+  // Static/inlined: this is a recorded run being replayed, not a live feed.
+  return { mode: "replay", run: RUN };
+
+  // ---- live mode (later): fetch a generated artifact or a state endpoint ----
+  // const res = await fetch('/run.json');   // or fetch('/state')
+  // if (!res.ok) throw new Error('failed to load run: ' + res.status);
+  // return { mode: "live", run: await res.json() };
+}
+
+// currentTick is the frame being rendered. The next step (timeline control)
+// will drive this variable and re-call render().
+let currentTick = 0;
+
+// mode reflects the data source: "replay" for a recorded run, "live" for a feed.
+let mode = "replay";
+
+// ---------------------------------------------------------------------------
+// Rendering
+// ---------------------------------------------------------------------------
+let DATA = null;
+
+function frameAt(tick) {
+  return DATA.timeline.find(f => f.tick === tick);
+}
+function eventsThrough(tick) {
+  return DATA.timeline
+    .filter(f => f.tick <= tick)
+    .flatMap(f => f.events.map(e => ({ ...e, tick: f.tick })));
+}
+function firstActiveTick() {
+  const f = DATA.timeline.find(f => f.fleet.some(d => d.status !== "healthy"));
+  return f ? f.tick : DATA.timeline[DATA.timeline.length - 1].tick;
+}
+
+const STATUS_COLOR = { healthy: "green", remediating: "red", awaiting_approval: "amber" };
+const fmt1 = n => Number(n).toFixed(1);
+const fmt2 = n => Number(n).toFixed(2);
+const titleCase = s => (s ? s.replace(/_/g, " ") : s);
+
+function renderHeader() {
+  document.getElementById("subtitle").textContent =
+    `${DATA.meta.model} · private / on-device`;
+  document.getElementById("pill-text").textContent = mode;
+  document.getElementById("pill").classList.toggle("mode-live", mode === "live");
+}
+
+function renderCards(frame, events) {
+  const healthy = frame.fleet.filter(d => d.healthy).length;
+  const total = frame.fleet.length;
+  const resolved = events.filter(e => e.result === "success").length;
+  const ev = DATA.eval.by_model[0].summary;
+
+  const cards = [
+    { label: "fleet healthy", value: `${healthy}`, unit: `/ ${total}` },
+    { label: "incidents resolved", value: `${resolved}`, unit: "" },
+    { label: "eval resolved", value: `${ev.resolved}`, unit: `/ ${ev.total}` }
+  ];
+  document.getElementById("cards").innerHTML = cards.map(c => `
+    <div class="card">
+      <div class="label">${c.label}</div>
+      <div class="value">${c.value} <span class="unit">${c.unit}</span></div>
+    </div>`).join("");
+}
+
+function metric(label, num, danger) {
+  return `<span class="metric ${danger ? "danger" : ""}">${label}<span class="num">${num}</span></span>`;
+}
+
+function renderFleet(frame) {
+  const th = DATA.meta.thresholds;
+  document.getElementById("fleet").innerHTML = frame.fleet.map(d => {
+    const t = d.telemetry;
+    const statusCls = STATUS_COLOR[d.status] || "muted";
+    return `
+      <div class="tile s-${d.status}">
+        <div class="top">
+          <span class="id">${d.id}</span>
+          <span class="tag ${statusCls}">${titleCase(d.status)}</span>
+        </div>
+        <div class="site">${d.site}</div>
+        <div class="telemetry">
+          ${metric("temp ", fmt1(t.cpu_temp_c), t.cpu_temp_c > th.cpu_temp_c)}
+          ${metric("lat ", fmt1(t.inference_latency_ms), t.inference_latency_ms > th.inference_latency_ms)}
+          ${metric("err ", fmt2(t.error_rate), t.error_rate > th.error_rate)}
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function resultBadge(e) {
+  if (e.result === "success") return { text: "resolved", cls: "green" };
+  if (e.verdict === "NEEDS_APPROVAL") return { text: "needs approval", cls: "amber" };
+  if (e.result === "denied") return { text: "denied", cls: "red" };
+  if (e.result === "rolled_back") return { text: "rolled back", cls: "red" };
+  if (e.result === "no_diagnosis") return { text: "no diagnosis", cls: "muted" };
+  return { text: titleCase(e.result), cls: "muted" };
+}
+
+function renderStream(events) {
+  const el = document.getElementById("stream");
+  if (!events.length) {
+    el.innerHTML = `<div class="empty">no decisions yet</div>`;
+    return;
+  }
+  el.innerHTML = events.slice().reverse().map(e => {
+    const b = resultBadge(e);
+    // Render-only lowercasing so model-generated diagnoses match the page's
+    // lowercase aesthetic; the underlying data is not mutated.
+    const diag = (e.diagnosis || "").toLowerCase();
+    const act = e.value === null || e.value === undefined
+      ? `${diag} → ${e.action}`
+      : `${diag} → ${e.action}(${e.value})`;
+    return `
+      <div class="row">
+        <span class="t">t${e.tick}</span>
+        <span class="dev">${e.device_id}</span>
+        <span class="act">${act}</span>
+        <span class="tag ${b.cls}">${b.text}</span>
+      </div>`;
+  }).join("");
+}
+
+function renderEval() {
+  document.getElementById("eval").innerHTML = DATA.eval.by_model.map(m => {
+    const s = m.summary;
+    // Per-decision wall-clock, shown in seconds (one decimal). The simulated
+    // fleet inference_latency_ms on tiles is unrelated to this.
+    const secs = ms => `~${(ms / 1000).toFixed(1)}s`;
+    const lat = (m.latency_per_decision_ms != null) ? `${secs(m.latency_per_decision_ms)} / decision`
+              : (m.latency_ms != null) ? `${secs(m.latency_ms)}`
+              : "n/a";
+    const stat = (k, v) => `<div class="stat"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+    return `
+      <div class="evalcard">
+        <div class="model">${m.model}</div>
+        <div class="lat">latency ${lat}</div>
+        ${stat("diagnosed", `${s.diagnosed}/${s.total}`)}
+        ${stat("in bounds", `${s.in_bounds}/${s.total}`)}
+        ${stat("resolved", `${s.resolved}/${s.total}`)}
+      </div>`;
+  }).join("");
+}
+
+function render() {
+  const frame = frameAt(currentTick);
+  const events = eventsThrough(currentTick);
+  renderHeader();
+  renderCards(frame, events);
+  renderFleet(frame);
+  renderStream(events);
+  renderEval();
+}
+
+async function init() {
+  const loaded = await loadRun();
+  mode = loaded.mode;
+  DATA = loaded.run;
+  currentTick = firstActiveTick();  // open on an incident, not an all-healthy frame
+  render();
+}
+
+init();
+</script>
+</body>
+</html>
