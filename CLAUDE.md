@@ -52,6 +52,12 @@ Building from scratch, step by step. Completed step: Step 1 — the fleet simula
   default (zero deps), --backend ollama for a real-model recording. run.json is a build
   artifact (gitignored); the dashboard inlines a recorded run for the web.
 
+- dashboard.html — self-contained replay visualization of a recorded run (inlined via
+  export_run.py). Reads through loadRun() (replay mode inlined; live mode = fetch, a
+  one-line change). Renders fleet tiles / decision stream / eval card, driven by a single
+  currentTick that a play/scrub control animates. Deploys as a static file. This is a
+  replay visualization, NOT observability (Prometheus/Grafana is a separate future step).
+
 ## Invariants (additions)
 - No action reaches the world without passing guardrails.evaluate first.
 - evaluate() is pure: no mutation, no I/O. Anything not whitelisted is DENIED.
