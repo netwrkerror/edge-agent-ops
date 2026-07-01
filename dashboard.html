@@ -99,6 +99,77 @@
   }
   .pill-live.mode-live .dot { background: var(--green); }
 
+  /* ---- timeline control ---- */
+  .timeline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-family: var(--font-sans);
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .btn:hover { border-color: var(--text-muted); }
+  .btn:focus-visible { outline: 2px solid var(--text-muted); outline-offset: 2px; }
+  .btn-ghost { color: var(--text-muted); }
+  /* play icon: a triangle (default) that becomes two bars when playing */
+  .btn .ico {
+    display: inline-block;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 5px 0 5px 8px;
+    border-color: transparent transparent transparent currentColor;
+  }
+  .btn.is-playing .ico {
+    width: 8px; height: 11px;
+    border: 0;
+    border-left: 3px solid currentColor;
+    border-right: 3px solid currentColor;
+    box-sizing: border-box;
+  }
+  .scrubber {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    min-width: 160px;
+    height: 18px;
+    background: transparent;
+    cursor: pointer;
+  }
+  .scrubber::-webkit-slider-runnable-track {
+    height: 4px; border-radius: 999px; background: var(--border);
+  }
+  .scrubber::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    margin-top: -5px;
+    width: 14px; height: 14px;
+    border-radius: 999px;
+    background: var(--text-muted);
+    border: none;
+  }
+  .scrubber::-moz-range-track {
+    height: 4px; border-radius: 999px; background: var(--border);
+  }
+  .scrubber::-moz-range-thumb {
+    width: 14px; height: 14px;
+    border-radius: 999px;
+    background: var(--text-muted);
+    border: none;
+  }
+  .scrubber:focus-visible { outline: 2px solid var(--text-muted); outline-offset: 4px; }
+  .readout { color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+
   /* ---- section headings ---- */
   h2.section {
     font-size: 12px;
@@ -238,6 +309,15 @@
     <span class="subtitle" id="subtitle"></span>
     <span class="pill-live" id="pill"><span class="dot"></span> <span id="pill-text">replay</span></span>
   </header>
+
+  <section class="timeline" aria-label="timeline control">
+    <button id="play-btn" class="btn" type="button" aria-label="play timeline">
+      <span class="ico"></span><span id="play-label">play</span>
+    </button>
+    <button id="reset-btn" class="btn btn-ghost" type="button" aria-label="reset to start">reset</button>
+    <input id="scrubber" class="scrubber" type="range" min="0" max="0" step="1" value="0" aria-label="timeline tick" />
+    <span id="tick-readout" class="readout mono">tick 0 / 0</span>
+  </section>
 
   <section class="cards" id="cards"></section>
 
@@ -420,6 +500,11 @@ let currentTick = 0;
 // mode reflects the data source: "replay" for a recorded run, "live" for a feed.
 let mode = "replay";
 
+// playback state
+const PLAY_MS = 1200;   // per-tick interval; slow enough to read each step
+let playing = false;
+let playTimer = null;
+
 // ---------------------------------------------------------------------------
 // Rendering
 // ---------------------------------------------------------------------------
@@ -557,12 +642,73 @@ function render() {
   renderEval();
 }
 
+// ---------------------------------------------------------------------------
+// Timeline control. currentTick + render() stay the single source of truth;
+// the slider, readout and play button all derive from currentTick via setTick().
+// ---------------------------------------------------------------------------
+function firstTick() { return DATA.timeline[0].tick; }
+function lastTick() { return DATA.timeline[DATA.timeline.length - 1].tick; }
+
+function setTick(t) {
+  currentTick = Math.max(firstTick(), Math.min(lastTick(), t));
+  render();          // existing render logic, unchanged
+  syncControls();    // keep slider/readout/button in sync with currentTick
+}
+
+function syncControls() {
+  const scrubber = document.getElementById("scrubber");
+  const readout = document.getElementById("tick-readout");
+  const btn = document.getElementById("play-btn");
+  scrubber.value = String(currentTick);
+  readout.textContent = `tick ${currentTick} / ${lastTick()}`;
+  btn.classList.toggle("is-playing", playing);
+  document.getElementById("play-label").textContent = playing ? "pause" : "play";
+  btn.setAttribute("aria-label", playing ? "pause timeline" : "play timeline");
+}
+
+function play() {
+  if (playing) return;
+  if (currentTick >= lastTick()) setTick(firstTick());  // at end: restart from start
+  playing = true;
+  syncControls();
+  playTimer = setInterval(() => {
+    if (currentTick >= lastTick()) { pause(); return; }  // stop at the end, no loop
+    setTick(currentTick + 1);
+  }, PLAY_MS);
+}
+
+function pause() {
+  playing = false;
+  if (playTimer) { clearInterval(playTimer); playTimer = null; }
+  syncControls();
+}
+
+function togglePlay() { playing ? pause() : play(); }
+
+function wireControls() {
+  const scrubber = document.getElementById("scrubber");
+  scrubber.min = String(firstTick());
+  scrubber.max = String(lastTick());
+  scrubber.step = "1";
+
+  document.getElementById("play-btn").addEventListener("click", togglePlay);
+  document.getElementById("reset-btn").addEventListener("click", () => {
+    pause();
+    setTick(firstTick());
+  });
+  // Manual scrubbing pauses playback — user intent wins.
+  scrubber.addEventListener("input", (e) => {
+    pause();
+    setTick(Number(e.target.value));
+  });
+}
+
 async function init() {
   const loaded = await loadRun();
   mode = loaded.mode;
   DATA = loaded.run;
-  currentTick = firstActiveTick();  // open on an incident, not an all-healthy frame
-  render();
+  wireControls();
+  setTick(firstTick());  // start paused at tick 0 so the story builds from the beginning
 }
 
 init();
