@@ -9,6 +9,7 @@ audit, verification, and rollback. (In active development.)
 - [x] Agent loop (observe → decide → check → apply → verify → rollback)
 - [x] Evaluation harness
 - [x] Local model (Ollama)
+- [x] Dashboard (replay visualization)
 
 ## The world (today)
 Brief: devices have a controllable parameter surface, telemetry that's a pure
@@ -44,6 +45,13 @@ deterministic (temp 0, reasoning off) and fails safe: any malformed response deg
 "no action taken" rather than crashing or acting wrongly. The same eval harness scores it
 unchanged; both qwen3:8b and qwen3:14b resolve all six scenarios, with 8b faster on
 24GB-class hardware. See llm_brain.py.
+
+## Dashboard
+A single self-contained page (dashboard.html) that replays a real recorded run of the
+system — fleet health tiles, a live decision stream, and the eval scorecard — with a
+play/scrub timeline. It foregrounds the guardrails in action: a denied out-of-bounds
+action, a rollback, and an approval hold. Runs from file:// with no backend; the data
+comes from export_run.py. [Live demo coming soon].
 
 ## Run
 python fleet.py     # demo: inject a fault, apply the fix, watch health restore
