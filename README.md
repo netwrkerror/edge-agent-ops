@@ -10,6 +10,7 @@ audit, verification, and rollback. (In active development.)
 - [x] Evaluation harness
 - [x] Local model (Ollama)
 - [x] Dashboard (replay visualization)
+- [x] Observability (Prometheus + Grafana)
 
 ## The world (today)
 Brief: devices have a controllable parameter surface, telemetry that's a pure
@@ -52,6 +53,9 @@ system — fleet health tiles, a live decision stream, and the eval scorecard �
 play/scrub timeline. It foregrounds the guardrails in action: a denied out-of-bounds
 action, a rollback, and an approval hold. Runs from file:// with no backend; the data
 comes from export_run.py. [Live demo coming soon].
+
+## Observability
+Optional local ops stack. The agent is instrumented with Prometheus metrics (metrics.py) — remediation outcomes by result, decision-latency histogram, approval holds, fleet health, and eval scores. serve_live.py exposes them on :8000; a docker-compose stack brings up Prometheus + a pre-provisioned Grafana board showing the guardrail story — denial rate, rollback rate, approval holds, fleet health, and decision-latency percentiles. This is real instrumentation, distinct from the replay dashboard. See OBSERVABILITY.md to run it.
 
 ## Run
 python fleet.py     # demo: inject a fault, apply the fix, watch health restore
