@@ -1,0 +1,10 @@
+# The core (fleet, guardrails, agent, evaluate) is standard-library only.
+# These are optional extras used by peripheral modules and the test suite.
+
+# metrics.py — Prometheus instrumentation (imported guarded; core no-ops without it)
+prometheus_client>=0.20
+
+# llm_brain.py talks to Ollama over stdlib urllib — no package needed.
+
+# development / tests
+pytest>=8.0
