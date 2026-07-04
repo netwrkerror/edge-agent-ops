@@ -58,6 +58,18 @@ Building from scratch, step by step. Completed step: Step 1 — the fleet simula
   currentTick that a play/scrub control animates. Deploys as a static file. This is a
   replay visualization, NOT observability (Prometheus/Grafana is a separate future step).
 
+- metrics.py — optional Prometheus instrumentation. Exposes edgeops_* metrics
+  (remediations_total by result, decision_latency_seconds histogram, approval_holds_total,
+  fleet_healthy gauge, eval_score gauges) via prometheus_client at /metrics. Isolated
+  behind a thin record_* API with a no-op fallback, so the core runs without the lib and
+  agent.py/guardrails.py never import prometheus types.
+
+- serve_live.py — a live Prometheus target: continuous sweeps that rotate through all
+  outcomes (success/denied/rolled_back/declined/no_diagnosis) and oscillate fleet health,
+  serving /metrics on :8000. Mock backend by default (fast; the loop is about metric
+  activity, not model quality — the real-model latency story lives in the eval on the
+  dashboard).
+
 ## Invariants (additions)
 - No action reaches the world without passing guardrails.evaluate first.
 - evaluate() is pure: no mutation, no I/O. Anything not whitelisted is DENIED.
@@ -77,6 +89,9 @@ Building from scratch, step by step. Completed step: Step 1 — the fleet simula
 - decide() must never raise; malformed model output degrades to no_diagnosis.
 - remediate_with_decision is the single gate→apply→verify→rollback path; the policy gate
   runs on every decision, brain-supplied or eval-supplied.
+- prometheus_client is optional; metrics calls are guarded so the core and existing tests
+  stay dependency-free. Metric instrumentation lives only in metrics.py.
+- The live loop uses the mock brain by default; the real model is not run on the 2s cadence.
 
 ## Data contract (run.json)
 { meta, timeline:[{tick, fleet:[{id,site,params,telemetry,healthy,injected_fault,status}],

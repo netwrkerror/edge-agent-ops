@@ -1,0 +1,13 @@
+# Prometheus config for the edge agent ops demo.
+# Scrapes serve_live.py's /metrics endpoint, which runs on the HOST (:8000).
+# On Docker Desktop (Mac/Windows) containers reach the host via
+# host.docker.internal — do NOT use localhost here (that would be the container).
+
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: edgeops
+    static_configs:
+      - targets: ['host.docker.internal:8000']

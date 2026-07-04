@@ -15,6 +15,7 @@ fault.
 
 from __future__ import annotations
 
+import time
 from typing import Any, Dict, List
 
 import guardrails
@@ -23,6 +24,23 @@ from fleet import (
     LATENCY_THRESHOLD_MS,
     TEMP_THRESHOLD_C,
 )
+
+# Optional metrics. Imported guarded so the core stays runnable and
+# dependency-free even if metrics.py / prometheus_client are unavailable.
+try:
+    import metrics as _metrics
+except Exception:  # pragma: no cover - defensive
+    _metrics = None
+
+
+def _emit_result(result: str) -> None:
+    if _metrics is not None:
+        _metrics.record_remediation(result)
+
+
+def _emit_approval_hold() -> None:
+    if _metrics is not None:
+        _metrics.record_approval_hold()
 
 
 # --------------------------------------------------------------------------- #
@@ -101,7 +119,10 @@ def remediate(device, brain, audit, interactive: bool = False) -> Dict[str, Any]
     Calls the brain exactly once for its proposed action, then runs the rest of
     the cycle on that single decision via `remediate_with_decision`.
     """
+    started = time.perf_counter()
     decision = brain.decide(device.view())
+    if _metrics is not None:
+        _metrics.observe_decision_latency(time.perf_counter() - started)
     return remediate_with_decision(device, decision, audit, interactive=interactive)
 
 
@@ -134,6 +155,7 @@ def remediate_with_decision(
         trace["applied"] = False
         trace["result"] = "no_diagnosis"
         audit.record(phase="result", device_id=device.id, result="no_diagnosis")
+        _emit_result("no_diagnosis")
         return trace
 
     # 3. Gate the action through policy — always.
@@ -153,9 +175,11 @@ def remediate_with_decision(
         trace["applied"] = False
         trace["result"] = "denied"
         audit.record(phase="result", device_id=device.id, result="denied")
+        _emit_result("denied")
         return trace
 
     if decision.status == guardrails.NEEDS_APPROVAL:
+        _emit_approval_hold()
         approved = guardrails.approver(action, value, interactive=interactive)
         trace["approved"] = approved
         audit.record(phase="approval", device_id=device.id, action=action, approved=approved)
@@ -163,6 +187,7 @@ def remediate_with_decision(
             trace["applied"] = False
             trace["result"] = "declined"
             audit.record(phase="result", device_id=device.id, result="declined")
+            _emit_result("declined")
             return trace
     else:  # ALLOW
         trace["approved"] = None
@@ -178,11 +203,13 @@ def remediate_with_decision(
         trace["healthy_after"] = True
         trace["result"] = "success"
         audit.record(phase="result", device_id=device.id, result="success")
+        _emit_result("success")
     else:
         device.restore(snapshot)
         trace["healthy_after"] = False
         trace["result"] = "rolled_back"
         audit.record(phase="result", device_id=device.id, result="rolled_back")
+        _emit_result("rolled_back")
 
     return trace
 
