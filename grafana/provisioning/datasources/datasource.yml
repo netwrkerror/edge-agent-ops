@@ -1,0 +1,11 @@
+# Auto-provisioned datasource: point Grafana at the prometheus service.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: edgeops-prom
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
