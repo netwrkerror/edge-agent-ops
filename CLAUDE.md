@@ -40,7 +40,8 @@ Building from scratch, step by step. Completed step: Step 1 — the fleet simula
 
 - llm_brain.py — OllamaBrain: a real local LLM behind the decide(view)->named-action
   interface. Imports action set/bounds/thresholds from fleet.py so the prompt can't drift.
-  Deterministic (temp 0, /no_think). decide() NEVER raises: bad/unreachable responses
+  As repeatable as an LLM gets (temp 0, JSON format, "think": false sent to Ollama to
+  disable qwen3's thinking mode). decide() NEVER raises: bad/unreachable responses
   return a noop/parse_error fallback. Selected via --backend ollama; lazily imported so
   the mock path stays dependency-free.
 

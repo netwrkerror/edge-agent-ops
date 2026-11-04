@@ -291,6 +291,13 @@
     padding: 14px 16px;
   }
   .evalcard .model { font-weight: 600; font-family: var(--font-mono); }
+  .evalcard .variant {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: 6px;
+  }
   .evalcard .lat { color: var(--text-muted); font-size: 12px; margin: 2px 0 12px; }
   .evalcard .stat {
     display: flex;
@@ -340,7 +347,7 @@
 const RUN = {
   "meta": {
     "schema_version": "1.0",
-    "generated_at": "2026-06-30T23:36:36.135119+00:00",
+    "generated_at": "2026-11-04T00:03:43.635286+00:00",
     "backend": "ollama",
     "model": "qwen3:8b",
     "ticks": 9,
@@ -354,107 +361,783 @@ const RUN = {
     {
       "tick": 0,
       "fleet": [
-        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
-        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
-        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
-        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+        {
+          "id": "edge-01",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        },
+        {
+          "id": "edge-02",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        },
+        {
+          "id": "edge-03",
+          "site": "plant-south",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        },
+        {
+          "id": "edge-04",
+          "site": "warehouse-east",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        }
       ],
       "events": []
     },
     {
       "tick": 1,
       "fleet": [
-        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
-        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
-        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
-        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+        {
+          "id": "edge-01",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "eco"
+          },
+          "telemetry": {
+            "cpu_temp_c": 64.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "thermal",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-02",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        },
+        {
+          "id": "edge-03",
+          "site": "plant-south",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        },
+        {
+          "id": "edge-04",
+          "site": "warehouse-east",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        }
       ],
       "events": [
-        { "device_id": "edge-01", "diagnosis": "overheating", "action": "set_power_mode", "value": "eco", "verdict": "ALLOW", "approved": null, "result": "success" }
+        {
+          "device_id": "edge-01",
+          "diagnosis": "Overheating",
+          "action": "set_power_mode",
+          "value": "eco",
+          "verdict": "ALLOW",
+          "approved": null,
+          "result": "success"
+        }
       ]
     },
     {
       "tick": 2,
       "fleet": [
-        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
-        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
-        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
-        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+        {
+          "id": "edge-01",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "eco"
+          },
+          "telemetry": {
+            "cpu_temp_c": 64.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "thermal",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-02",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        },
+        {
+          "id": "edge-03",
+          "site": "plant-south",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 4,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 176.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "latency",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-04",
+          "site": "warehouse-east",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        }
       ],
       "events": [
-        { "device_id": "edge-03", "diagnosis": "High inference latency", "action": "scale_workers", "value": 4, "verdict": "ALLOW", "approved": null, "result": "success" }
+        {
+          "device_id": "edge-03",
+          "diagnosis": "High latency",
+          "action": "scale_workers",
+          "value": 4,
+          "verdict": "ALLOW",
+          "approved": null,
+          "result": "success"
+        }
       ]
     },
     {
       "tick": 3,
       "fleet": [
-        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
-        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
-        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
-        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+        {
+          "id": "edge-01",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "eco"
+          },
+          "telemetry": {
+            "cpu_temp_c": 64.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "thermal",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-02",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        },
+        {
+          "id": "edge-03",
+          "site": "plant-south",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 4,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 176.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "latency",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-04",
+          "site": "warehouse-east",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        }
       ],
       "events": [
-        { "device_id": "edge-04", "diagnosis": "high error rate", "action": "restart_worker", "value": null, "verdict": "NEEDS_APPROVAL", "approved": true, "result": "success" }
+        {
+          "device_id": "edge-04",
+          "diagnosis": "High error rate",
+          "action": "restart_worker",
+          "value": null,
+          "verdict": "NEEDS_APPROVAL",
+          "approved": true,
+          "result": "success"
+        }
       ]
     },
     {
       "tick": 4,
       "fleet": [
-        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
-        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 89.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": false, "injected_fault": "thermal", "status": "remediating" },
-        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
-        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+        {
+          "id": "edge-01",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "eco"
+          },
+          "telemetry": {
+            "cpu_temp_c": 64.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "thermal",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-02",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 89.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": false,
+          "injected_fault": "thermal",
+          "status": "remediating"
+        },
+        {
+          "id": "edge-03",
+          "site": "plant-south",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 4,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 176.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "latency",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-04",
+          "site": "warehouse-east",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        }
       ],
       "events": [
-        { "device_id": "edge-02", "diagnosis": "thermal", "action": "scale_workers", "value": 99, "verdict": "DENY", "approved": null, "result": "denied" }
+        {
+          "device_id": "edge-02",
+          "diagnosis": "thermal",
+          "action": "scale_workers",
+          "value": 99,
+          "verdict": "DENY",
+          "approved": null,
+          "result": "denied"
+        }
       ]
     },
     {
       "tick": 5,
       "fleet": [
-        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
-        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 89.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": false, "injected_fault": "thermal", "status": "remediating" },
-        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
-        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+        {
+          "id": "edge-01",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "eco"
+          },
+          "telemetry": {
+            "cpu_temp_c": 64.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "thermal",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-02",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 89.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": false,
+          "injected_fault": "thermal",
+          "status": "remediating"
+        },
+        {
+          "id": "edge-03",
+          "site": "plant-south",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 4,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 176.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "latency",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-04",
+          "site": "warehouse-east",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        }
       ],
       "events": [
-        { "device_id": "edge-02", "diagnosis": "thermal", "action": "scale_workers", "value": 8, "verdict": "ALLOW", "approved": null, "result": "rolled_back" }
+        {
+          "device_id": "edge-02",
+          "diagnosis": "thermal",
+          "action": "scale_workers",
+          "value": 8,
+          "verdict": "ALLOW",
+          "approved": null,
+          "result": "rolled_back"
+        }
       ]
     },
     {
       "tick": 6,
       "fleet": [
-        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
-        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
-        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
-        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+        {
+          "id": "edge-01",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "eco"
+          },
+          "telemetry": {
+            "cpu_temp_c": 64.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "thermal",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-02",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "eco"
+          },
+          "telemetry": {
+            "cpu_temp_c": 64.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "thermal",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-03",
+          "site": "plant-south",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 4,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 176.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "latency",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-04",
+          "site": "warehouse-east",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        }
       ],
       "events": [
-        { "device_id": "edge-02", "diagnosis": "Overheating detected", "action": "set_power_mode", "value": "eco", "verdict": "ALLOW", "approved": null, "result": "success" }
+        {
+          "device_id": "edge-02",
+          "diagnosis": "Overheating",
+          "action": "set_power_mode",
+          "value": "eco",
+          "verdict": "ALLOW",
+          "approved": null,
+          "result": "success"
+        }
       ]
     },
     {
       "tick": 7,
       "fleet": [
-        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 29.0, "inference_latency_ms": 76.0, "error_rate": 0.21 }, "healthy": false, "injected_fault": "error", "status": "awaiting_approval" },
-        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
-        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
-        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+        {
+          "id": "edge-01",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "eco"
+          },
+          "telemetry": {
+            "cpu_temp_c": 29.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.21
+          },
+          "healthy": false,
+          "injected_fault": "error",
+          "status": "awaiting_approval"
+        },
+        {
+          "id": "edge-02",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "eco"
+          },
+          "telemetry": {
+            "cpu_temp_c": 64.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "thermal",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-03",
+          "site": "plant-south",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 4,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 176.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "latency",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-04",
+          "site": "warehouse-east",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        }
       ],
       "events": [
-        { "device_id": "edge-01", "diagnosis": "error", "action": "restart_worker", "value": null, "verdict": "NEEDS_APPROVAL", "approved": false, "result": "declined" }
+        {
+          "device_id": "edge-01",
+          "diagnosis": "error",
+          "action": "restart_worker",
+          "value": null,
+          "verdict": "NEEDS_APPROVAL",
+          "approved": false,
+          "result": "declined"
+        }
       ]
     },
     {
       "tick": 8,
       "fleet": [
-        { "id": "edge-01", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 29.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" },
-        { "id": "edge-02", "site": "plant-north", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "eco" }, "telemetry": { "cpu_temp_c": 64.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "thermal", "status": "healthy" },
-        { "id": "edge-03", "site": "plant-south", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 4, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 176.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": "latency", "status": "healthy" },
-        { "id": "edge-04", "site": "warehouse-east", "site_type": "industrial", "params": { "batch_size": 8, "worker_count": 2, "power_mode": "normal" }, "telemetry": { "cpu_temp_c": 54.0, "inference_latency_ms": 76.0, "error_rate": 0.01 }, "healthy": true, "injected_fault": null, "status": "healthy" }
+        {
+          "id": "edge-01",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "eco"
+          },
+          "telemetry": {
+            "cpu_temp_c": 29.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        },
+        {
+          "id": "edge-02",
+          "site": "plant-north",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "eco"
+          },
+          "telemetry": {
+            "cpu_temp_c": 64.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "thermal",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-03",
+          "site": "plant-south",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 4,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 176.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": "latency",
+          "status": "healthy"
+        },
+        {
+          "id": "edge-04",
+          "site": "warehouse-east",
+          "site_type": "industrial",
+          "params": {
+            "batch_size": 8,
+            "worker_count": 2,
+            "power_mode": "normal"
+          },
+          "telemetry": {
+            "cpu_temp_c": 54.0,
+            "inference_latency_ms": 76.0,
+            "error_rate": 0.01
+          },
+          "healthy": true,
+          "injected_fault": null,
+          "status": "healthy"
+        }
       ],
       "events": [
-        { "device_id": "edge-01", "diagnosis": "high error rate", "action": "restart_worker", "value": null, "verdict": "NEEDS_APPROVAL", "approved": true, "result": "success" }
+        {
+          "device_id": "edge-01",
+          "diagnosis": "High error rate",
+          "action": "restart_worker",
+          "value": null,
+          "verdict": "NEEDS_APPROVAL",
+          "approved": true,
+          "result": "success"
+        }
       ]
     }
   ],
@@ -463,17 +1146,290 @@ const RUN = {
       {
         "backend": "ollama",
         "model": "qwen3:8b",
+        "latency_ms": 9208,
+        "latency_per_decision_ms": 1535,
+        "summary": {
+          "total": 6,
+          "diagnosed": 6,
+          "diagnosed_rate": 1.0,
+          "in_bounds": 6,
+          "in_bounds_rate": 1.0,
+          "resolved": 6,
+          "resolved_rate": 1.0
+        },
+        "scenarios": [
+          {
+            "name": "thermal_basic",
+            "fault": "thermal",
+            "proposed": {
+              "action": "set_power_mode",
+              "value": "eco"
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "thermal_turbo_load",
+            "fault": "thermal",
+            "proposed": {
+              "action": "set_power_mode",
+              "value": "eco"
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "latency_basic",
+            "fault": "latency",
+            "proposed": {
+              "action": "scale_workers",
+              "value": 4
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "latency_heavy_batch",
+            "fault": "latency",
+            "proposed": {
+              "action": "scale_workers",
+              "value": 4
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "error_basic",
+            "fault": "error",
+            "proposed": {
+              "action": "restart_worker",
+              "value": null
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "NEEDS_APPROVAL",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "error_busy",
+            "fault": "error",
+            "proposed": {
+              "action": "restart_worker",
+              "value": null
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "NEEDS_APPROVAL",
+            "resolved": true,
+            "result": "success"
+          }
+        ],
+        "thinking": false
+      },
+      {
+        "backend": "ollama",
+        "model": "qwen3:14b",
+        "latency_ms": 16362,
+        "latency_per_decision_ms": 2727,
+        "summary": {
+          "total": 6,
+          "diagnosed": 6,
+          "diagnosed_rate": 1.0,
+          "in_bounds": 6,
+          "in_bounds_rate": 1.0,
+          "resolved": 6,
+          "resolved_rate": 1.0
+        },
+        "scenarios": [
+          {
+            "name": "thermal_basic",
+            "fault": "thermal",
+            "proposed": {
+              "action": "set_power_mode",
+              "value": "eco"
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "thermal_turbo_load",
+            "fault": "thermal",
+            "proposed": {
+              "action": "set_power_mode",
+              "value": "eco"
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "latency_basic",
+            "fault": "latency",
+            "proposed": {
+              "action": "scale_workers",
+              "value": 4
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "latency_heavy_batch",
+            "fault": "latency",
+            "proposed": {
+              "action": "scale_workers",
+              "value": 6
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "error_basic",
+            "fault": "error",
+            "proposed": {
+              "action": "restart_worker",
+              "value": null
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "NEEDS_APPROVAL",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "error_busy",
+            "fault": "error",
+            "proposed": {
+              "action": "restart_worker",
+              "value": null
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "NEEDS_APPROVAL",
+            "resolved": true,
+            "result": "success"
+          }
+        ],
+        "thinking": false
+      },
+      {
+        "backend": "ollama",
+        "model": "qwen3:8b",
         "latency_ms": 72756,
         "latency_per_decision_ms": 12126,
-        "summary": { "total": 6, "diagnosed": 6, "diagnosed_rate": 1.0, "in_bounds": 6, "in_bounds_rate": 1.0, "resolved": 6, "resolved_rate": 1.0 },
+        "summary": {
+          "total": 6,
+          "diagnosed": 6,
+          "diagnosed_rate": 1.0,
+          "in_bounds": 6,
+          "in_bounds_rate": 1.0,
+          "resolved": 6,
+          "resolved_rate": 1.0
+        },
         "scenarios": [
-          { "name": "thermal_basic", "fault": "thermal", "proposed": { "action": "set_power_mode", "value": "eco" }, "diagnosed": true, "in_bounds": true, "verdict": "ALLOW", "resolved": true, "result": "success" },
-          { "name": "thermal_turbo_load", "fault": "thermal", "proposed": { "action": "set_power_mode", "value": "eco" }, "diagnosed": true, "in_bounds": true, "verdict": "ALLOW", "resolved": true, "result": "success" },
-          { "name": "latency_basic", "fault": "latency", "proposed": { "action": "scale_workers", "value": 4 }, "diagnosed": true, "in_bounds": true, "verdict": "ALLOW", "resolved": true, "result": "success" },
-          { "name": "latency_heavy_batch", "fault": "latency", "proposed": { "action": "scale_workers", "value": 4 }, "diagnosed": true, "in_bounds": true, "verdict": "ALLOW", "resolved": true, "result": "success" },
-          { "name": "error_basic", "fault": "error", "proposed": { "action": "restart_worker", "value": null }, "diagnosed": true, "in_bounds": true, "verdict": "NEEDS_APPROVAL", "resolved": true, "result": "success" },
-          { "name": "error_busy", "fault": "error", "proposed": { "action": "restart_worker", "value": null }, "diagnosed": true, "in_bounds": true, "verdict": "NEEDS_APPROVAL", "resolved": true, "result": "success" }
-        ]
+          {
+            "name": "thermal_basic",
+            "fault": "thermal",
+            "proposed": {
+              "action": "set_power_mode",
+              "value": "eco"
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "thermal_turbo_load",
+            "fault": "thermal",
+            "proposed": {
+              "action": "set_power_mode",
+              "value": "eco"
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "latency_basic",
+            "fault": "latency",
+            "proposed": {
+              "action": "scale_workers",
+              "value": 4
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "latency_heavy_batch",
+            "fault": "latency",
+            "proposed": {
+              "action": "scale_workers",
+              "value": 4
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "ALLOW",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "error_basic",
+            "fault": "error",
+            "proposed": {
+              "action": "restart_worker",
+              "value": null
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "NEEDS_APPROVAL",
+            "resolved": true,
+            "result": "success"
+          },
+          {
+            "name": "error_busy",
+            "fault": "error",
+            "proposed": {
+              "action": "restart_worker",
+              "value": null
+            },
+            "diagnosed": true,
+            "in_bounds": true,
+            "verdict": "NEEDS_APPROVAL",
+            "resolved": true,
+            "result": "success"
+          }
+        ],
+        "thinking": true
       }
     ]
   }
@@ -623,7 +1579,7 @@ function renderEval() {
     const stat = (k, v) => `<div class="stat"><span class="k">${k}</span><span class="v">${v}</span></div>`;
     return `
       <div class="evalcard">
-        <div class="model">${m.model}</div>
+        <div class="model">${m.model}${m.thinking != null ? ` <span class="variant">thinking ${m.thinking ? "on" : "off"}</span>` : ""}</div>
         <div class="lat">latency ${lat}</div>
         ${stat("diagnosed", `${s.diagnosed}/${s.total}`)}
         ${stat("in bounds", `${s.in_bounds}/${s.total}`)}

@@ -93,3 +93,16 @@ def test_parse_decision_never_raises():
         except Exception as exc:  # noqa: BLE001 - the whole point is no escape
             pytest.fail(f"parse_decision raised on {content!r}: {exc}")
         assert "action" in d
+
+
+def test_request_payload_disables_thinking_and_pins_determinism():
+    # Built offline; no server is contacted.
+    from fleet import Device
+    from llm_brain import OllamaBrain
+
+    payload = OllamaBrain(model="qwen3:8b")._build_payload(Device(id="d", site="s").view())
+    assert payload["think"] is False          # thinking tokens off
+    assert payload["format"] == "json"        # JSON-only output
+    assert payload["stream"] is False
+    assert payload["options"]["temperature"] == 0
+    assert payload["model"] == "qwen3:8b"

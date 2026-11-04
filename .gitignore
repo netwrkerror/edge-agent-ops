@@ -1,3 +1,7 @@
 NOTES.md
 PROMPTS.md
 run*.json
+
+# Python environment and bytecode
+.venv/
+__pycache__/
