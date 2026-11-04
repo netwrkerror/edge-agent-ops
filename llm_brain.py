@@ -137,8 +137,9 @@ class OllamaBrain:
 
     # ---- the call -------------------------------------------------------- #
 
-    def _post_chat(self, view: Dict[str, Any]) -> Dict[str, Any]:
-        payload = {
+    def _build_payload(self, view: Dict[str, Any]) -> Dict[str, Any]:
+        """The /api/chat request body. Kept separate so it can be tested offline."""
+        return {
             "model": self.model,
             "messages": [
                 {"role": "system", "content": self._system_prompt()},
@@ -146,9 +147,14 @@ class OllamaBrain:
             ],
             "stream": False,
             "format": "json",
+            # Disable qwen3's thinking mode: hidden reasoning tokens dominate
+            # per-decision latency and aren't needed for a constrained JSON answer.
+            "think": False,
             "options": {"temperature": 0},
         }
-        data = json.dumps(payload).encode("utf-8")
+
+    def _post_chat(self, view: Dict[str, Any]) -> Dict[str, Any]:
+        data = json.dumps(self._build_payload(view)).encode("utf-8")
         req = urllib.request.Request(
             f"{self.host}/api/chat",
             data=data,
